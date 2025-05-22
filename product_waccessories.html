@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="favicon.ico">
+  <title>Shop Handmade | Women's Accessories</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      overflow-x: hidden;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      transition: background 0.3s;
+      z-index: 1000;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .logo img {
+      height: 40px;
+    }
+    .search-bar {
+      width: 300px;
+      margin: 0 2rem;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .header-icons i {
+      margin-left: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+      color: grey;
+    }
+    .header-icons i:hover { transform: scale(1.2); }
+
+    /* Main content area with sidebar and products */
+    .main-container {
+      display: flex;
+      min-height: 100vh;
+      margin-top: 70px; /* To account for fixed header */
+      background: #f5f5f5;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #f1f1f1;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+    }
+    .sidebar h3 { margin-bottom: 20px; font-size: 16px; }
+    .filter-section { margin-bottom: 20px; }
+    .filter-section label { display: block; margin: 8px 0; cursor: pointer; }
+    .filter-section details summary { cursor: pointer; font-weight: bold; }
+
+    .products {
+      flex: 1;
+      padding: 40px;
+    }
+    .products h2 { margin-bottom: 20px; }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .product-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .product-card:hover { transform: translateY(-5px); }
+
+    .product-image {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      background-size: cover;
+      background-position: center;
+    }
+    .product-card:hover .hover-image { opacity: 1; }
+    .hover-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .add-to-cart {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .product-card:hover .add-to-cart { opacity: 1; }
+
+    .product-info {
+      padding: 15px;
+    }
+    .product-title { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+    .product-price { color: gray; font-size: 13px; }
+
+    .pagination {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .pagination a {
+      margin: 0 5px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    footer {
+      background: #f5f5f5;
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .footer-left {
+      display: flex;
+      flex-wrap: nowrap;
+      flex: 1 1 60%;
+      gap: 1rem;
+    }
+    .footer-section {
+      min-width: 150px;
+      flex-grow: 1;
+    }
+    .subscribe {
+      flex: 1 1 30%;
+    }
+    .subscribe input[type="email"] {
+      padding: 0.5rem;
+      width: 70%;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .subscribe button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 20px;
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+    .footer-bottom {
+      text-align: center;
+      width: 100%;
+      padding-top: 1rem;
+      border-top: 1px solid #ccc;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Floating Cart */
+    .floating-cart {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 320px;
+      height: 80vh;
+      background: white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      border-radius: 15px;
+      overflow: hidden;
+      z-index: 1060;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    .floating-cart.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .cart-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 1050;
+      display: none;
+    }
+    .cart-content {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .cart-item {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .cart-info {
+      flex-grow: 1;
+    }
+    .cart-qty {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .cart-qty button {
+      padding: 0.2rem 0.6rem;
+      border: 1px solid #ccc;
+      background: none;
+      cursor: pointer;
+    }
+    .cart-footer {
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .checkout-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    /* Floating Menu */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1100;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    .floating-menu {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 350px;
+      height: 100%;
+      background: white;
+      z-index: 1101;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+    }
+    .floating-menu.active {
+      right: 0;
+    }
+    .menu-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .close-menu {
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #333;
+    }
+    .menu-nav {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-nav > a {
+      padding: 0.8rem 0;
+      text-decoration: none;
+      color: #333;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #f5f5f5;
+      transition: color 0.2s;
+    }
+    .menu-nav > a:hover {
+      color: #000;
+      font-weight: 500;
+    }
+    .menu-category {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0.8rem 0;
+      font-size: 1.1rem;
+      color: #333;
+      cursor: pointer;
+      border-bottom: 1px solid #f5f5f5;
+      text-align: left;
+    }
+    .menu-toggle:hover {
+      color: #000;
+      font-weight: 500;
+    }
+    .menu-toggle i {
+      transition: transform 0.3s;
+    }
+    .menu-toggle.active i {
+      transform: rotate(180deg);
+    }
+    .submenu {
+      padding-left: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .submenu.active {
+      max-height: 1000px;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.6rem 0;
+      text-decoration: none;
+      color: #555;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #f9f9f9;
+    }
+    .submenu a:hover {
+      color: #000;
+    }
+    .submenu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0.6rem 0 0.6rem 1rem;
+      font-size: 0.95rem;
+      color: #555;
+      cursor: pointer;
+    }
+    .submenu-toggle i {
+      transition: transform 0.3s;
+    }
+    .submenu-toggle.active i {
+      transform: rotate(180deg);
+    }
+    .sub-submenu {
+      padding-left: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .sub-submenu.active {
+      max-height: 1000px;
+    }
+
+    @media (max-width: 1024px) {
+      .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+      }
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .footer-left, .subscribe {
+        flex: 1 1 100%;
+      }
+      .search-bar {
+        width: 200px;
+      }
+      .floating-cart {
+        width: 90%;
+        right: 5%;
+      }
+      .floating-menu {
+        width: 85%;
+        right: -85%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        padding: 1rem;
+      }
+      .search-bar {
+        width: 150px;
+        margin: 0 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="logo"><a href="index.html"><img src="logocolored.svg" alt="Ajrakh Logo"></a></div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for Products">
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-shopping-cart" id="cart-icon"></i>
+      <i class="fas fa-user"></i>
+      <i class="fas fa-bars" id="menu-toggle"></i>
+    </div>
+  </header>
+
+  <!-- Floating Menu -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <div class="floating-menu" id="floating-menu">
+    <div class="menu-header">
+      <button class="close-menu" id="close-menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <nav class="menu-nav">
+      <a href="index.html">Home</a>
+      
+      <button class="menu-toggle" id="shop-toggle">
+        Shop handmade
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="submenu" id="shop-submenu">
+        <button class="submenu-toggle" id="womens-toggle">
+          Women's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="womens-submenu">
+          <a href="#">Sarees</a>
+          <a href="#">Dresses</a>
+          <a href="#">Kurtis</a>
+          <a href="#">Dupattas</a>
+          <a href="#">Accessories</a>
+        </div>
+        
+        <button class="submenu-toggle" id="mens-toggle">
+          Men's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="mens-submenu">
+          <a href="#">Kurtas</a>
+          <a href="#">Shirts</a>
+          <a href="#">Co-ord sets</a>
+          <a href="#">Stoles</a>
+          <a href="#">Accessories</a>
+        </div>
+        
+        <button class="submenu-toggle" id="kids-toggle">
+          Kid's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="kids-submenu">
+          <a href="#">Kurta sets</a>
+          <a href="#">Dresses</a>
+          <a href="#">Shirts</a>
+          <a href="#">Festive wear</a>
+          <a href="#">Mini accessories</a>
+        </div>
+      </div>
+      
+      <a href="#">Meet our artisans</a>
+      <a href="#">Stories</a>
+      <a href="#">About us</a>
+      <a href="#">Neelkaar</a>
+    </nav>
+  </div>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <h3>Filter & Sort</h3>
+
+      <div class="filter-section">
+        <h4>Sort By</h4>
+        <label><input type="radio" name="sort" checked> Best Selling</label>
+        <label><input type="radio" name="sort"> Newest</label>
+        <label><input type="radio" name="sort"> Price: Low to High</label>
+        <label><input type="radio" name="sort"> Price: High to Low</label>
+      </div>
+
+      <div class="filter-section">
+        <details>
+          <summary>Price</summary>
+          <label><input type="checkbox"> Under ₹1000</label>
+          <label><input type="checkbox"> ₹1000 - ₹2000</label>
+          <label><input type="checkbox"> ₹2000 - ₹3000</label>
+        </details>
+      </div>
+
+      <div class="filter-section">
+        <details>
+          <summary>Size</summary>
+          <label><input type="checkbox"> S</label>
+          <label><input type="checkbox"> M</label>
+          <label><input type="checkbox"> L</label>
+          <label><input type="checkbox"> XL</label>
+        </details>
+      </div>
+
+      <div class="filter-section">
+        <details>
+          <summary>Category</summary>
+          <label><input type="checkbox"> Kurtis</label>
+          <label><input type="checkbox"> Sarees</label>
+          <label><input type="checkbox"> Shirts</label>
+        </details>
+      </div>
+
+      <button style="margin-top: 10px; padding: 8px 16px;">Apply</button>
+    </aside>
+
+    <main class="products">
+      <h2>Women's Accessories</h2>
+      <div class="product-grid">
+        <!-- 12 dummy products -->
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+        <a href="productpage.html" class="product-link">
+          <div class="product-card">
+            <div class="product-image" style="background-image: url('placeholder.jpg');">
+              <div class="hover-image" style="background-image: url('placeholder2.jpg');"></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+            <div class="product-info">
+              <div class="product-title">Sample Product</div>
+              <div class="product-price">₹1,299</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="pagination">
+        <a href="#">&laquo; BACK</a>
+        <a href="#">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">NEXT &raquo;</a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-section">
+        <h4>Get in Touch</h4>
+        <p> Email: info@neelkaar.org</p>
+      </div>
+      <div class="footer-section">
+        <h4>Our Company</h4>
+        <p>About Us<br>Contact Us<br>Jobs</p>
+      </div>
+      <div class="footer-section">
+        <h4>Customer Support</h4>
+        <p>Disclaimer<br>Shipping & Handling<br>Return & Exchange<br>FAQs</p>
+      </div>
+      <div class="footer-section">
+        <h4>Policy</h4>
+        <p>Track Your Order<br>Privacy Policy</p>
+      </div>
+    </div>
+    <div class="subscribe">
+      <h4>Subscribe</h4>
+      <input type="email" placeholder="Your Email">
+      <button>Subscribe</button>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 Neelkaar. All rights reserved.
+    </div>
+  </footer>
+
+  <div class="cart-overlay"></div>
+
+  <div class="floating-cart">
+    <div class="cart-content">
+      <div class="cart-item">
+        <img src="mstoles.jpg" alt="Product 1" />
+        <div class="cart-info">
+          <strong>Ajrakh Shawl</strong><br>
+          ₹1,200
+          <div class="cart-qty">
+            <button>-</button><span>1</span><button>+</button>
+          </div>
+        </div>
+        <button style="border: none; background: none; font-size: 1.2rem;">&times;</button>
+      </div>
+      <div class="cart-item">
+        <img src="wdupattas.jpg" alt="Product 2" />
+        <div class="cart-info">
+          <strong>Block Print Dupatta</strong><br>
+          ₹1,800
+          <div class="cart-qty">
+            <button>-</button><span>1</span><button>+</button>
+          </div>
+        </div>
+        <button style="border: none; background: none; font-size: 1.2rem;">&times;</button>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <p style="margin-bottom: 10px;">Total: ₹3,000</p>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    // Shopping cart functionality
+    const cartIcon = document.getElementById('cart-icon');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const floatingCart = document.querySelector('.floating-cart');
+
+    cartIcon.addEventListener('click', () => {
+      floatingCart.classList.toggle('open');
+      cartOverlay.style.display = floatingCart.classList.contains('open') ? 'block' : 'none';
+    });
+
+    cartOverlay.addEventListener('click', () => {
+      floatingCart.classList.remove('open');
+      cartOverlay.style.display = 'none';
+    });
+
+    // Floating menu functionality
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const floatingMenu = document.getElementById('floating-menu');
+    const shopToggle = document.getElementById('shop-toggle');
+    const shopSubmenu = document.getElementById('shop-submenu');
+    const womensToggle = document.getElementById('womens-toggle');
+    const womensSubmenu = document.getElementById('womens-submenu');
+    const mensToggle = document.getElementById('mens-toggle');
+    const mensSubmenu = document.getElementById('mens-submenu');
+    const kidsToggle = document.getElementById('kids-toggle');
+    const kidsSubmenu = document.getElementById('kids-submenu');
+
+    menuToggle.addEventListener('click', () => {
+      floatingMenu.classList.add('active');
+      menuOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeMenu.addEventListener('click', () => {
+      floatingMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    menuOverlay.addEventListener('click', () => {
+      floatingMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    // Toggle shop submenu
+    shopToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      shopToggle.classList.toggle('active');
+      shopSubmenu.classList.toggle('active');
+    });
+
+    // Toggle women's wear submenu
+    womensToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      womensToggle.classList.toggle('active');
+      womensSubmenu.classList.toggle('active');
+    });
+
+    // Toggle men's wear submenu
+    mensToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mensToggle.classList.toggle('active');
+      mensSubmenu.classList.toggle('active');
+    });
+
+    // Toggle kid's wear submenu
+    kidsToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      kidsToggle.classList.toggle('active');
+      kidsSubmenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    document.querySelectorAll('.menu-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        floatingMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+
+    // Add to cart functionality for product cards
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Here you would add the actual product to cart
+        // For now, we'll just show the cart
+        floatingCart.classList.add('open');
+        cartOverlay.style.display = 'block';
+      });
+    });
+
+    // Product card click handling (excluding add-to-cart button)
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        // If the click was on the add-to-cart button, don't redirect
+        if (e.target.classList.contains('add-to-cart') || 
+            e.target.closest('.add-to-cart')) {
+          return;
+        }
+        // Otherwise, let the anchor tag handle the navigation
+      });
+    });
+  </script>
+</body>
+</html>

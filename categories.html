@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+  <title>Shop Handmade | Categories</title>
+  <link rel="icon" type="image/x-icon" href="favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ffffff;
+      color: #222;
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      transition: background 0.3s;
+      z-index: 1000;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .logo img {
+      height: 40px;
+      transition: filter 0.3s ease;
+    }
+    .search-bar {
+      width: 300px;
+      margin: 0 2rem;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .header-icons i {
+      margin-left: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, color 0.3s;
+      color: grey;
+    }
+    .header-icons i:hover { transform: scale(1.2); }
+
+    /* Banner */
+    .banner {
+      height: 300px;
+      background-image: url('banner2.jpg');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 80px; /* To account for fixed header */
+    }
+
+    .banner-text {
+      font-size: 3rem;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      padding: 20px 40px;
+    }
+
+    /* Section Headings */
+    .category-section {
+      padding: 30px 5%;
+    }
+
+    .category-section h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      color: #333;
+    }
+
+    /* Category Grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+    }
+
+    .category-item {
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      height: 300px;
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: filter 0.3s ease-in-out;
+    }
+
+    .category-item::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      transition: background 0.3s;
+    }
+
+    .category-item:hover::after {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .category-item span {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Footer Styles */
+    footer {
+      background: #f5f5f5;
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .footer-left {
+      display: flex;
+      flex-wrap: nowrap;
+      flex: 1 1 60%;
+      gap: 1rem;
+    }
+    .footer-section {
+      min-width: 150px;
+      flex-grow: 1;
+    }
+    .subscribe {
+      flex: 1 1 30%;
+    }
+    .subscribe input[type="email"] {
+      padding: 0.5rem;
+      width: 70%;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .subscribe button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 20px;
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+    .footer-bottom {
+      text-align: center;
+      width: 100%;
+      padding-top: 1rem;
+      border-top: 1px solid #ccc;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Floating Cart */
+    .floating-cart {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 320px;
+      height: 80vh;
+      background: white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      border-radius: 15px;
+      overflow: hidden;
+      z-index: 1060;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    .floating-cart.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .cart-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 1050;
+      display: none;
+    }
+    .cart-content {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .cart-item {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .cart-info {
+      flex-grow: 1;
+    }
+    .cart-qty {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .cart-qty button {
+      padding: 0.2rem 0.6rem;
+      border: 1px solid #ccc;
+      background: none;
+      cursor: pointer;
+    }
+    .cart-footer {
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .checkout-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    /* Floating Menu */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1100;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    .floating-menu {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 350px;
+      height: 100%;
+      background: white;
+      z-index: 1101;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+    }
+    .floating-menu.active {
+      right: 0;
+    }
+    .menu-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .close-menu {
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #333;
+    }
+    .menu-nav {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-nav > a {
+      padding: 0.8rem 0;
+      text-decoration: none;
+      color: #333;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #f5f5f5;
+      transition: color 0.2s;
+    }
+    .menu-nav > a:hover {
+      color: #000;
+      font-weight: 500;
+    }
+    .menu-category {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0.8rem 0;
+      font-size: 1.1rem;
+      color: #333;
+      cursor: pointer;
+      border-bottom: 1px solid #f5f5f5;
+      text-align: left;
+    }
+    .menu-toggle:hover {
+      color: #000;
+      font-weight: 500;
+    }
+    .menu-toggle i {
+      transition: transform 0.3s;
+    }
+    .menu-toggle.active i {
+      transform: rotate(180deg);
+    }
+    .submenu {
+      padding-left: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .submenu.active {
+      max-height: 1000px;
+    }
+    .submenu a {
+      display: block;
+      padding: 0.6rem 0;
+      text-decoration: none;
+      color: #555;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #f9f9f9;
+    }
+    .submenu a:hover {
+      color: #000;
+    }
+    .submenu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0.6rem 0 0.6rem 1rem;
+      font-size: 0.95rem;
+      color: #555;
+      cursor: pointer;
+    }
+    .submenu-toggle i {
+      transition: transform 0.3s;
+    }
+    .submenu-toggle.active i {
+      transform: rotate(180deg);
+    }
+    .sub-submenu {
+      padding-left: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .sub-submenu.active {
+      max-height: 1000px;
+    }
+
+    @media (max-width: 768px) {
+      .footer-left, .subscribe {
+        flex: 1 1 100%;
+      }
+      .search-bar {
+        width: 200px;
+      }
+      .floating-cart {
+        width: 90%;
+        right: 5%;
+      }
+      .floating-menu {
+        width: 85%;
+        right: -85%;
+      }
+      .banner-text {
+        font-size: 2rem;
+        padding: 15px 25px;
+      }
+      .category-section h2 {
+        font-size: 1.4rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .banner {
+        height: 200px;
+      }
+      .header-icons i {
+        margin-left: 0.7rem;
+      }
+      .search-bar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo"><a href="index.html"><img src="logocolored.svg" alt="Ajrakh Logo"></a></div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for Products">
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-shopping-cart"></i>
+      <i class="fas fa-user"></i>
+      <i class="fas fa-bars" id="menu-toggle"></i>
+    </div>
+  </header>
+
+  <!-- Floating Menu -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <div class="floating-menu" id="floating-menu">
+    <div class="menu-header">
+      <button class="close-menu" id="close-menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <nav class="menu-nav">
+      <a href="Index.html">Home</a>
+      
+      <button class="menu-toggle" id="shop-toggle">
+        Shop handmade
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="submenu" id="shop-submenu">
+        <button class="submenu-toggle" id="womens-toggle">
+          Women's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="womens-submenu">
+          <a href="product_wsarees.html">Sarees</a>
+          <a href="product_wdresses.html">Dresses</a>
+          <a href="product_wkurtis.html">Kurtis</a>
+          <a href="product_wdupattas.html">Dupattas</a>
+          <a href="product_waccessories.html">Accessories</a>
+        </div>
+        
+        <button class="submenu-toggle" id="mens-toggle">
+          Men's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="mens-submenu">
+          <a href="product_mkurtas.html">Kurtas</a>
+          <a href="product_mshirts.html">Shirts</a>
+          <a href="products_mcoords.html">Co-ord sets</a>
+          <a href="products_mstoles.html">Stoles</a>
+          <a href="products_maccessories.html">Accessories</a>
+        </div>
+        
+        <button class="submenu-toggle" id="kids-toggle">
+          Kid's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="kids-submenu">
+          <a href="products_kkurtas.html">Kurta sets</a>
+          <a href="products_kdresses.html">Dresses</a>
+          <a href="products_kshirts.html">Shirts</a>
+          <a href="products_kfestive.html">Festive wear</a>
+          <a href="products_kaccessories.html">Mini accessories</a>
+        </div>
+      </div>
+      
+      <a href="#">Meet our artisans</a>
+      <a href="#">Stories</a>
+      <a href="#">About us</a>
+      <a href="#">Neelkaar</a>
+    </nav>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner">
+    <div class="banner-text">Shop Handmade</div>
+  </div>
+
+  <!-- Women's Wear -->
+  <section class="category-section">
+    <br>
+    <br>
+    <h2>Women's Wear</h2>
+    <div class="category-grid">
+      <a href="product_wsarees.html" class="category-item" style="background-image: url('wsarees.jpg');"><span>Sarees</span></a>
+      <a href="product_wdresses.html" class="category-item" style="background-image: url('wdresses.jpg');"><span>Dresses</span></a>
+      <a href="product_wkurtis.html" class="category-item" style="background-image: url('wkurtis.jpg');"><span>Kurtis</span></a>
+      <a href="product_wdupattas.html" class="category-item" style="background-image: url('wdupattas.jpg');"><span>Dupattas</span></a>
+      <a href="product_waccessories.html" class="category-item" style="background-image: url('waccessories.jpg');"><span>Accessories</span></a>
+    </div>
+  </section>
+
+  <!-- Men's Wear -->
+  <section class="category-section">
+    <h2>Men's Wear</h2>
+    <div class="category-grid">
+      <a href="product_mkurtas.html" class="category-item" style="background-image: url('mkurtas.jpg');"><span>Kurtas</span></a>
+      <a href="product_mshirts.html" class="category-item" style="background-image: url('mshirts.jpg');"><span>Shirts</span></a>
+      <a href="products_mcoords.html" class="category-item" style="background-image: url('mcoords.jpg');"><span>Co-ord Sets</span></a>
+      <a href="products_mstoles.html" class="category-item" style="background-image: url('mstoles.jpg');"><span>Stoles</span></a>
+      <a href="products_maccessories.html" class="category-item" style="background-image: url('maccessories.jpg');"><span>Accessories</span></a>
+    </div>
+  </section>
+
+  <!-- Kid's Wear -->
+  <section class="category-section">
+    <h2>Kid's Wear</h2>
+    <div class="category-grid">
+      <a href="products_kkurtas.html" class="category-item" style="background-image: url('kkurtas.jpg');"><span>Kurta Sets</span></a>
+      <a href="products_kdresses.html" class="category-item" style="background-image: url('kdresses.jpg');"><span>Dresses</span></a>
+      <a href="products_kshirts.html" class="category-item" style="background-image: url('kshirts.jpg');"><span>Shirts</span></a>
+      <a href="products_kfestive.html" class="category-item" style="background-image: url('kfestives.jpg');"><span>Festive Wear</span></a>
+      <a href="products_kaccessories.html" class="category-item" style="background-image: url('kaccessories.jpg');"><span>Mini Accessories</span></a>
+    </div>
+    <br>
+    <br>
+    <br>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-left">
+      <div class="footer-section">
+        <h4>Get in Touch</h4>
+        <p> Email: info@neelkaar.org</p>
+      </div>
+      <div class="footer-section">
+        <h4>Our Company</h4>
+        <p>About Us<br>Contact Us<br>Jobs</p>
+      </div>
+      <div class="footer-section">
+        <h4>Customer Support</h4>
+        <p>Disclaimer<br>Shipping & Handling<br>Return & Exchange<br>FAQs</p>
+      </div>
+      <div class="footer-section">
+        <h4>Policy</h4>
+        <p>Track Your Order<br>Privacy Policy</p>
+      </div>
+    </div>
+    <div class="subscribe">
+      <h4>Subscribe</h4>
+      <input type="email" placeholder="Your Email">
+      <button>Subscribe</button>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 Neelkaar. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Floating Cart -->
+  <div class="cart-overlay"></div>
+  <div class="floating-cart">
+    <div class="cart-content">
+      <div class="cart-item">
+        <img src="mstoles.jpg" alt="Product 1" />
+        <div class="cart-info">
+          <strong>Ajrakh Shawl</strong><br>
+          ₹1,200
+          <div class="cart-qty">
+            <button>-</button><span>1</span><button>+</button>
+          </div>
+        </div>
+        <button style="border: none; background: none; font-size: 1.2rem;">&times;</button>
+      </div>
+      <div class="cart-item">
+        <img src="wdupattas.jpg" alt="Product 2" />
+        <div class="cart-info">
+          <strong>Block Print Dupatta</strong><br>
+          ₹1,800
+          <div class="cart-qty">
+            <button>-</button><span>1</span><button>+</button>
+          </div>
+        </div>
+        <button style="border: none; background: none; font-size: 1.2rem;">&times;</button>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <p style="margin-bottom: 10px;">Total: ₹3,000</p>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    // Shopping cart functionality
+    const cartIcon = document.querySelector('.fa-shopping-cart');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const floatingCart = document.querySelector('.floating-cart');
+
+    cartIcon.addEventListener('click', () => {
+      floatingCart.classList.toggle('open');
+      cartOverlay.style.display = floatingCart.classList.contains('open') ? 'block' : 'none';
+    });
+
+    cartOverlay.addEventListener('click', () => {
+      floatingCart.classList.remove('open');
+      cartOverlay.style.display = 'none';
+    });
+
+    // Floating menu functionality
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const floatingMenu = document.getElementById('floating-menu');
+    const shopToggle = document.getElementById('shop-toggle');
+    const shopSubmenu = document.getElementById('shop-submenu');
+    const womensToggle = document.getElementById('womens-toggle');
+    const womensSubmenu = document.getElementById('womens-submenu');
+    const mensToggle = document.getElementById('mens-toggle');
+    const mensSubmenu = document.getElementById('mens-submenu');
+    const kidsToggle = document.getElementById('kids-toggle');
+    const kidsSubmenu = document.getElementById('kids-submenu');
+
+    menuToggle.addEventListener('click', () => {
+      floatingMenu.classList.add('active');
+      menuOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeMenu.addEventListener('click', () => {
+      floatingMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    menuOverlay.addEventListener('click', () => {
+      floatingMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    // Toggle shop submenu
+    shopToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      shopToggle.classList.toggle('active');
+      shopSubmenu.classList.toggle('active');
+    });
+
+    // Toggle women's wear submenu
+    womensToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      womensToggle.classList.toggle('active');
+      womensSubmenu.classList.toggle('active');
+    });
+
+    // Toggle men's wear submenu
+    mensToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mensToggle.classList.toggle('active');
+      mensSubmenu.classList.toggle('active');
+    });
+
+    // Toggle kid's wear submenu
+    kidsToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      kidsToggle.classList.toggle('active');
+      kidsSubmenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    document.querySelectorAll('.menu-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        floatingMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+
+    // Quantity controls in cart
+    document.querySelectorAll('.cart-qty button').forEach(button => {
+      button.addEventListener('click', function() {
+        const span = this.parentElement.querySelector('span');
+        let quantity = parseInt(span.textContent);
+        
+        if (this.textContent === '+' && quantity < 10) {
+          quantity++;
+        } else if (this.textContent === '-' && quantity > 1) {
+          quantity--;
+        }
+        
+        span.textContent = quantity;
+        updateCartTotal();
+      });
+    });
+
+    // Remove item from cart
+    document.querySelectorAll('.cart-item button[style*="border: none"]').forEach(button => {
+      button.addEventListener('click', function() {
+        this.closest('.cart-item').remove();
+        updateCartTotal();
+      });
+    });
+
+    // Update cart total
+    function updateCartTotal() {
+      let total = 0;
+      document.querySelectorAll('.cart-item').forEach(item => {
+        const priceText = item.querySelector('.cart-info').children[1].textContent;
+        const price = parseInt(priceText.replace(/[^0-9]/g, ''));
+        const quantity = parseInt(item.querySelector('.cart-qty span').textContent);
+        total += price * quantity;
+      });
+      
+      document.querySelector('.cart-footer p').textContent = `Total: ₹${total.toLocaleString('en-IN')}`;
+    }
+  </script>
+</body>
+</html>

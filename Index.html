@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico">
+  <title>Story of Ajrakh</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      overflow-x: hidden;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      transition: background 0.3s;
+      z-index: 1000;
+    }
+    header.transparent { background: transparent; }
+    header.scrolled {
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .logo img {
+      height: 40px;
+      transition: filter 0.3s ease;
+    }
+    .search-bar {
+      width: 300px;
+      margin: 0 2rem;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .header-icons i {
+      margin-left: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, color 0.3s;
+      color: white;
+    }
+    .header-icons i.scrolled-icon,
+    header.scrolled .header-icons i {
+      color: grey;
+    }
+    .header-icons i:hover { transform: scale(1.2); }
+
+    .banner {
+      height: 100vh;
+      background: url('banner.jpeg') center/cover fixed;
+      color: white;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .banner-logo img { height: 200px; margin-bottom: 20px; }
+    .scroll-down {
+      position: absolute;
+      bottom: 20px;
+      font-size: 2rem;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+
+    .content {
+      padding: 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .section {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 2rem;
+      align-items: center;
+    }
+    .section:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+    .section img {
+      width: 40%;
+      border-radius: 15px;
+    }
+    .section .text {
+      width: 60%;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .cta-buttons a {
+      border: 2px solid #000;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      text-decoration: none;
+      color: #000;
+      transition: background 0.3s;
+    }
+    .cta-buttons a:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    footer {
+      background: #f5f5f5;
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .footer-left {
+      display: flex;
+      flex-wrap: nowrap;
+      flex: 1 1 60%;
+      gap: 1rem;
+    }
+    .footer-section {
+      min-width: 150px;
+      flex-grow: 1;
+    }
+    .subscribe {
+      flex: 1 1 30%;
+    }
+    .subscribe input[type="email"] {
+      padding: 0.5rem;
+      width: 70%;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+    .subscribe button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 20px;
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+    .footer-bottom {
+      text-align: center;
+      width: 100%;
+      padding-top: 1rem;
+      border-top: 1px solid #ccc;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Floating Cart */
+    .floating-cart {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 320px;
+      height: 80vh;
+      background: white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      border-radius: 15px;
+      overflow: hidden;
+      z-index: 1060;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    .floating-cart.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .cart-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 1050;
+      display: none;
+    }
+    .cart-content {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .cart-item {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .cart-info {
+      flex-grow: 1;
+    }
+    .cart-qty {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .cart-qty button {
+      padding: 0.2rem 0.6rem;
+      border: 1px solid #ccc;
+      background: none;
+      cursor: pointer;
+    }
+    .cart-footer {
+      padding: 1rem;
+      border-top: 1px solid #eee;
+    }
+    .checkout-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    /* Floating Menu */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1100;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+    .floating-menu {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 350px;
+      height: 100%;
+      background: white;
+      z-index: 1101;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding: 2rem 1.5rem;
+    }
+    .floating-menu.active {
+      right: 0;
+    }
+    .menu-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .close-menu {
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #333;
+    }
+    .menu-nav {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-nav > a {
+      padding: 0.8rem 0;
+      text-decoration: none;
+      color: #333;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #f5f5f5;
+      transition: color 0.2s;
+    }
+    .menu-nav > a:hover {
+      color: #000;
+      font-weight: 500;
+    }
+    .menu-category {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0.8rem 0;
+      font-size: 1.1rem;
+      color: #333;
+      cursor: pointer;
+      border-bottom: 1px solid #f5f5f5;
+      text-align: left;
+    }
+    .menu-toggle:hover {
+      color: #000;
+      font-weight: 500;
+    }
+    .menu-toggle i {
+      transition: transform 0.3s;
+    }
+    .menu-toggle.active i {
+      transform: rotate(180deg);
+    }
+    .submenu {
+      padding-left: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .submenu.active {
+      max-height: 1000px; /* Adjust based on your content */
+    }
+    .submenu a {
+      display: block;
+      padding: 0.6rem 0;
+      text-decoration: none;
+      color: #555;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #f9f9f9;
+    }
+    .submenu a:hover {
+      color: #000;
+    }
+    .submenu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0.6rem 0 0.6rem 1rem;
+      font-size: 0.95rem;
+      color: #555;
+      cursor: pointer;
+    }
+    .submenu-toggle i {
+      transition: transform 0.3s;
+    }
+    .submenu-toggle.active i {
+      transform: rotate(180deg);
+    }
+    .sub-submenu {
+      padding-left: 1rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .sub-submenu.active {
+      max-height: 1000px;
+    }
+
+    @media (max-width: 768px) {
+      .section {
+        flex-direction: column;
+      }
+      .section img, .section .text {
+        width: 100%;
+      }
+      .footer-left, .subscribe {
+        flex: 1 1 100%;
+      }
+      .search-bar {
+        width: 200px;
+      }
+      .floating-cart {
+        width: 90%;
+        right: 5%;
+      }
+      .floating-menu {
+        width: 85%;
+        right: -85%;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <header class="transparent">
+    <div class="logo"><a href="index.html"><img src="logowhite.svg" rel="preload"></a></div>
+    <div class="search-bar">
+      <input type="text" placeholder="Search for Products">
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-shopping-cart"></i>
+      <i class="fas fa-user"></i>
+      <i class="fas fa-bars" id="menu-toggle"></i>
+    </div>
+  </header>
+
+  <!-- Floating Menu -->
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <div class="floating-menu" id="floating-menu">
+    <div class="menu-header">
+      <button class="close-menu" id="close-menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <nav class="menu-nav">
+      <a href="Index.html">Home</a>
+      
+      <button class="menu-toggle" id="shop-toggle">
+        Shop handmade
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="submenu" id="shop-submenu">
+        <button class="submenu-toggle" id="womens-toggle">
+          Women's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="womens-submenu">
+          <a href="product_wsarees.html">Sarees</a>
+          <a href="product_wdresses.html">Dresses</a>
+          <a href="product_wkurtis.html">Kurtis</a>
+          <a href="product_wdupattas.html">Dupattas</a>
+          <a href="product_waccessories.html">Accessories</a>
+        </div>
+        
+        <button class="submenu-toggle" id="mens-toggle">
+          Men's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="mens-submenu">
+          <a href="product_mkurtas.html">Kurtas</a>
+          <a href="product_mshirts.html">Shirts</a>
+          <a href="products_mcoords.html">Co-ord sets</a>
+          <a href="products_mstoles.html">Stoles</a>
+          <a href="products_maccessories.html">Accessories</a>
+        </div>
+        
+        <button class="submenu-toggle" id="kids-toggle">
+          Kid's wear
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="sub-submenu" id="kids-submenu">
+          <a href="products_kkurtas.html">Kurta sets</a>
+          <a href="products_kdresses.html">Dresses</a>
+          <a href="products_kshirts.html">Shirts</a>
+          <a href="products_kfestive.html">Festive wear</a>
+          <a href="products_kaccessories.html">Mini accessories</a>
+        </div>
+      </div>
+      
+      <a href="#">Meet our artisans</a>
+      <a href="#">Stories</a>
+      <a href="#">About us</a>
+      <a href="#">Neelkaar</a>
+    </nav>
+  </div>
+
+  <section class="banner">
+    <div class="banner-logo"><img src="storyajrakh.svg" alt="Story of Ajrakh Logo"></div>
+    <div class="scroll-down">&#8595;</div>
+  </section>
+
+  <section class="content">
+    <div class="section">
+      <img src="ajrakh1.jpg" alt="Ajrakh Craft">
+      <div class="text">
+        <h2>Origins & Essence of Ajrakh</h2>
+        <p ALIGN="JUSTIFY">Ajrakh, also known as Azrak or Ajrak, is a traditional resist-printed textile art that traces its roots to the Indus Valley Civilization (around 3000 BCE). Practiced in regions of Kutch (Gujarat), Barmer (Rajasthan), and Sindh (Pakistan), this intricate craft employs natural vegetable and mineral dyes—most notably indigo and madder—to create geometrically patterned textiles. The process is deeply interwoven with nature, involving sun-drying, river water rinsing, mud-resist applications, and plant-derived colorants, reflecting a harmonious interaction between earth, water, flora, fauna, and human effort. The name ‘Ajrakh’ stems from the Sanskrit term “A-jharat,” meaning “that which does not fade,” and also translates to “blue” in Arabic—highlighting indigo’s prominence. Recognizable by its bold red-blue colorways and repeating motifs arranged in symmetrical patterns or central “jaal,” Ajrakh stands as a living art form that bridges heritage with meticulous craftsmanship.</p>
+      </div>
+    </div>
+    <div class="section">
+      <img src="ajrakh2.jpg" alt="Ajrakh Making Process">
+      <div class="text">
+        <h2>Evolution of a Timeless Textile</h2>
+        <p ALIGN="JUSTIFY" >From the ancient priest-king of Mohenjo-daro draped in patterned cloth to royal courts and global runways, Ajrakh has undergone a profound journey of adaptation. Its resurgence in mainland India can be traced back to the 16th–17th centuries, when the Khatri community—originally Brahmins, later converted to Islam—migrated under the patronage of Kutch ruler Rao Bharmalji. Settling in villages conducive to block printing, they helped Ajrakh flourish within Gujarat and Rajasthan. With growing international demand, especially during the East India Company era, Ajrakh textiles became export items admired worldwide. Over time, color palettes expanded beyond the traditional red, blue, black, and white, influenced by modern tastes while preserving the craft’s essence. Despite these shifts, Ajrakh retains its authenticity through its labor-intensive, multi-step process and deeply cultural symbolism, continuing to thrive as both a functional textile and a symbol of India’s living craft heritage.</p>
+      </div>
+    </div>
+    <div class="cta-buttons">
+      <a href="categories.html">Shop Handmade</a>
+      <a href="#artisans">Meet Our Artisans</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-section">
+        <h4>Get in Touch</h4>
+        <p> Email: info@neelkaar.org</p>
+      </div>
+      <div class="footer-section">
+        <h4>Our Company</h4>
+        <p>About Us<br>Contact Us<br>Jobs</p>
+      </div>
+      <div class="footer-section">
+        <h4>Customer Support</h4>
+        <p>Disclaimer<br>Shipping & Handling<br>Return & Exchange<br>FAQs</p>
+      </div>
+      <div class="footer-section">
+        <h4>Policy</h4>
+        <p>Track Your Order<br>Privacy Policy</p>
+      </div>
+    </div>
+    <div class="subscribe">
+      <h4>Subscribe</h4>
+      <input type="email" placeholder="Your Email">
+      <button>Subscribe</button>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 Neelkaar. All rights reserved.
+    </div>
+  </footer>
+
+  <div class="cart-overlay"></div>
+
+  <div class="floating-cart">
+    <div class="cart-content">
+      <div class="cart-item">
+        <img src="mstoles.jpg" alt="Product 1" />
+        <div class="cart-info">
+          <strong>Ajrakh Shawl</strong><br>
+          ₹1,200
+          <div class="cart-qty">
+            <button>-</button><span>1</span><button>+</button>
+          </div>
+        </div>
+        <button style="border: none; background: none; font-size: 1.2rem;">&times;</button>
+      </div>
+      <div class="cart-item">
+        <img src="wdupattas.jpg" alt="Product 2" />
+        <div class="cart-info">
+          <strong>Block Print Dupatta</strong><br>
+          ₹1,800
+          <div class="cart-qty">
+            <button>-</button><span>1</span><button>+</button>
+          </div>
+        </div>
+        <button style="border: none; background: none; font-size: 1.2rem;">&times;</button>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <p style="margin-bottom: 10px;">Total: ₹3,000</p>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    // Header scroll effect
+    window.addEventListener('scroll', function () {
+      const header = document.querySelector('header');
+      const logo = document.querySelector('.logo img');
+      const icons = document.querySelectorAll('.header-icons i');
+
+      const isScrolled = window.scrollY > window.innerHeight * 0.9;
+      header.classList.toggle('scrolled', isScrolled);
+      logo.src = isScrolled ? 'logocolored.svg' : 'logowhite.svg';
+
+      icons.forEach(icon => {
+        icon.classList.toggle('scrolled-icon', isScrolled);
+      });
+    });
+
+    // Shopping cart functionality
+    const cartIcon = document.querySelector('.fa-shopping-cart');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const floatingCart = document.querySelector('.floating-cart');
+
+    cartIcon.addEventListener('click', () => {
+      floatingCart.classList.toggle('open');
+      cartOverlay.classList.toggle('active');
+    });
+
+    cartOverlay.addEventListener('click', () => {
+      floatingCart.classList.remove('open');
+      cartOverlay.classList.remove('active');
+    });
+
+    // Floating menu functionality
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const floatingMenu = document.getElementById('floating-menu');
+    const shopToggle = document.getElementById('shop-toggle');
+    const shopSubmenu = document.getElementById('shop-submenu');
+    const womensToggle = document.getElementById('womens-toggle');
+    const womensSubmenu = document.getElementById('womens-submenu');
+    const mensToggle = document.getElementById('mens-toggle');
+    const mensSubmenu = document.getElementById('mens-submenu');
+    const kidsToggle = document.getElementById('kids-toggle');
+    const kidsSubmenu = document.getElementById('kids-submenu');
+
+    menuToggle.addEventListener('click', () => {
+      floatingMenu.classList.add('active');
+      menuOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeMenu.addEventListener('click', () => {
+      floatingMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    menuOverlay.addEventListener('click', () => {
+      floatingMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    });
+
+    // Toggle shop submenu
+    shopToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      shopToggle.classList.toggle('active');
+      shopSubmenu.classList.toggle('active');
+    });
+
+    // Toggle women's wear submenu
+    womensToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      womensToggle.classList.toggle('active');
+      womensSubmenu.classList.toggle('active');
+    });
+
+    // Toggle men's wear submenu
+    mensToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mensToggle.classList.toggle('active');
+      mensSubmenu.classList.toggle('active');
+    });
+
+    // Toggle kid's wear submenu
+    kidsToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      kidsToggle.classList.toggle('active');
+      kidsSubmenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    document.querySelectorAll('.menu-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        floatingMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+  </script>
+</body>
+</html>
